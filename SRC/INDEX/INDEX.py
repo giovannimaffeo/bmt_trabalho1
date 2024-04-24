@@ -45,31 +45,32 @@ def main():
     term_document_df = pd.DataFrame.from_dict(term_document_matrix, orient='index')
     term_document_df.fillna(0, inplace=True)
 
-    print("Calculando o Term Frequency (TF) a partir da matriz termo documento, onde aij é o TF do termo i no documento"
-          " j")
-    tf = term_document_df.div(term_document_df.sum(axis=0), axis=1)
+    print("Calculando a matriz Term Frequency (TF) a partir da matriz termo documento, onde aij é o TF do termo i no "
+          "documento j e é dado por frequência do termo no documento dividido pela maior frequência no documento")
+    # Calcula o máximo de cada coluna (documento)
+    max_frquences = term_document_df.max()
+    # Divide cada valor pelo máximo da coluna correspondente
+    tf_df = term_document_df.div(max_frquences, axis=1)
 
-    print("Calculando o Inverse Document Frequency (IDF) a partir da matriz termo documento, onde aij é o IDF do termo "
-          "i (possui apenas uma coluna)")
+    print("Calculando a matriz Inverse Document Frequency (IDF) a partir da matriz termo documento, onde cada elemento "
+          "corresponde ao IDF de cada termo dado por: log ( número de documentos no conjunto / número de documentos que"
+          " contém o termo")
     # Número total de documentos
     total_docs = len(term_document_df.columns)
     # Número de documentos que contêm cada termo
     docs_containing_term = term_document_df.astype(bool).sum(axis=1)
-    idf = np.log(total_docs / (1 + docs_containing_term))
+    idf_df = np.log10(total_docs / (docs_containing_term))
 
     print("Criando DataFrame de TF-IDF a partir da multiplicação de TF por IDF")
-    tf_idf_rows = []
-    for i, row in tf.iterrows():
-        tf_idf_row = row.mul(idf.iloc[1], axis=0)
-        tf_idf_rows.append(tf_idf_row)
-    tf_idf_df = pd.DataFrame(tf_idf_rows)
-    tf_idf_df.columns = term_document_df.columns
-    tf_idf_df.index = term_document_df.index
+    tf_idf_df = tf_df.copy()  # Cria uma cópia do DataFrame tf_df para tf_idf_df
+    for i in range(len(idf_df.values)):
+        # Multiplica cada linha do DataFrame tf_idf_df pelo valor de IDF correspondente
+        tf_idf_df.iloc[i] *= idf_df.values[i]
 
     print("Retornando estrutura que armazena TF-IDF para uso posterior pelo BUSCADOR")
     print("Finalizando INDEX em", time.strftime("%H:%M:%S"))
 
-    return tf_idf_df
+    return tf_idf_df, idf_df
 
 if __name__ == "__main__":
     main()
