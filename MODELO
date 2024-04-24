@@ -20,8 +20,8 @@ cosseno.
 Estrutura do Modelo:
 - Vetorial Model: Representa os documentos como vetores, onde cada dimensão corresponde a um termo e o valor representa
 a importância do termo no documento.
-IDF Matrix: Uma matriz que armazena os valores IDF de cada termo.
-Query Vectorial Model: Uma representação vetorial das consultas, semelhante ao Vetorial Model, usado para calcular a
+- IDF Matrix: Uma matriz que armazena os valores IDF de cada termo.
+- Query Vectorial Model: Uma representação vetorial das consultas, semelhante ao Vetorial Model, usado para calcular a
 similaridade com os documentos. O processo de busca utiliza o Vetorial Model, IDF Matrix e Query Vectorial Model para
 calcular a relevância dos documentos em relação às consultas.
 
