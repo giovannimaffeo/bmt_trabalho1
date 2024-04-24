@@ -18,7 +18,7 @@ def main():
             file.write(data)
 
     print("Lendo o arquivo de configuração")
-    config = process_config('./PC/PC.CFG')
+    config = process_config('SRC/PC/PC.CFG')
 
     remove_semicolon(config['LEIA'])
 

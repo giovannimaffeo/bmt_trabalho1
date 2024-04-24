@@ -17,7 +17,7 @@ def main():
     print("Iniciando GLI em", time.strftime("%H:%M:%S"))
 
     print("Lendo o arquivo de configuração")
-    config = process_config('GLI/GLI.CFG')
+    config = process_config('SRC/GLI/GLI.CFG')
 
     print("Definindo dicionário para armazenar a palavra processada e o número de registros")
     words_dict = {}

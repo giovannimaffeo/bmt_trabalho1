@@ -17,7 +17,7 @@ def main():
         return cleaned_word
 
     print("Lendo o arquivo de configuração: output escreva.csv do GLI")
-    config = process_config('INDEX/INDEX.CFG')
+    config = process_config('SRC/INDEX/INDEX.CFG')
 
     print("Criando matriz termo documento, onde aij é o número de registros do termo i no documento j")
     term_document_matrix = {}
@@ -60,7 +60,7 @@ def main():
     print("Criando DataFrame de TF-IDF a partir da multiplicação de TF por IDF")
     tf_idf_rows = []
     for i, row in tf.iterrows():
-        tf_idf_row = row * idf[1]
+        tf_idf_row = row.mul(idf.iloc[1], axis=0)
         tf_idf_rows.append(tf_idf_row)
     tf_idf_df = pd.DataFrame(tf_idf_rows)
     tf_idf_df.columns = term_document_df.columns
