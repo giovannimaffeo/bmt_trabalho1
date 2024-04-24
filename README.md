@@ -2,4 +2,4 @@
 
 - Instalar python
 - Clonar repositório
-- Executar programa a partir do comando python main.py no diretório raiz
+- Executar programa a partir do comando **python main.py** no diretório raiz
