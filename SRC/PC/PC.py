@@ -10,7 +10,7 @@ def main():
     print("Iniciando PC em", time.strftime("%H:%M:%S"))
 
     def remove_semicolon(filename):
-        print("Removendo ';' do arquivo XML:", filename)
+        print("Removendo ';' do arquivo XML")
         with open(filename, 'r') as file:
             data = file.read()
             data = data.replace(';', '')
@@ -27,14 +27,17 @@ def main():
     root = tree.getroot()
 
     def process_query(query_text):
-        print("Remover acentos e converter para maiúsculas:", query_text)
+        # Remover acentos e converter para maiúsculas
         query_text = ''.join(c for c in unicodedata.normalize('NFD', query_text) if unicodedata.category(c) != 'Mn')
         query_text = query_text.upper()
         return query_text
 
+    print("Gerando primeiro output: consultas.csv")
+    print("Definindo estruturas para armazenar os query_numbers e query_texts")
     query_numbers = []
     query_texts = []
 
+    print("Iterar sobre arquivo de leitura, processar textos e popular estruturas")
     for query in root.findall('.//QUERY'):
         query_number = query.find('QueryNumber').text
         query_text = query.find('QueryText').text
@@ -46,13 +49,16 @@ def main():
 
     df['QueryText'] = df['QueryText'].apply(process_query)
 
-    print("Gerando arquivo CSV")
+    print("Gerando arquivo consultas.csv")
     df.to_csv(config['CONSULTAS'], sep=';', index=False)
 
+    print("Gerando segundo output: esperados.csv")
+    print("Definindo estruturas para armazenar os query_numbers, doc_numbers e doc_votes")
     query_numbers = []
     doc_numbers = []
     doc_votes = []
 
+    print("Iterar sobre arquivo de leitura para popular estruturas")
     for query in root.findall('.//QUERY'):
         query_number = query.find('QueryNumber').text
 
@@ -71,7 +77,7 @@ def main():
 
     df = pd.DataFrame({'QueryNumber': query_numbers, 'DocNumber': doc_numbers, 'DocVotes': doc_votes})
 
-    print("Escrevendo DataFrame em um arquivo CSV")
+    print("Gerando arquivo esperados.csv")
     df.to_csv(config['ESPERADOS'], sep=';', index=False)
 
     print("Finalizando PC em", time.strftime("%H:%M:%S"))
