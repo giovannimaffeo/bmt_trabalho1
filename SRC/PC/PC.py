@@ -3,98 +3,78 @@ import pandas as pd
 import unicodedata
 import time
 
-from utils import process_config
+from SRC.utils import process_config
 
-print("Iniciando PC em", time.strftime("%H:%M:%S"))
 
-print("Função para remover os ';' do arquivo XML")
-# Função para remover os ";" do arquivo XML
-def remove_semicolon(filename):
-    print("Removendo ';' do arquivo XML:", filename)
-    with open(filename, 'r') as file:
-        data = file.read()
-        data = data.replace(';', '')
-    with open(filename, 'w') as file:
-        file.write(data)
+def main():
+    print("Iniciando PC em", time.strftime("%H:%M:%S"))
 
-# Ler o arquivo de configuração
-print("Lendo o arquivo de configuração")
-config = process_config('PC.CFG')
+    def remove_semicolon(filename):
+        print("Removendo ';' do arquivo XML:", filename)
+        with open(filename, 'r') as file:
+            data = file.read()
+            data = data.replace(';', '')
+        with open(filename, 'w') as file:
+            file.write(data)
 
-# Remover ";" do arquivo XML
-remove_semicolon(config['LEIA'])
+    print("Lendo o arquivo de configuração")
+    config = process_config('./PC/PC.CFG')
 
-# Carregar o arquivo XML
-print("Carregando o arquivo XML")
-tree = ET.parse(config['LEIA'])
-root = tree.getroot()
+    remove_semicolon(config['LEIA'])
 
-# ------------------------------------------------------- GERAR PRIMEIRO ARQUIVO
+    print("Carregando o arquivo XML")
+    tree = ET.parse(config['LEIA'])
+    root = tree.getroot()
 
-print("Função para remover acentos e converter para maiúsculas")
-# Função para remover acentos e converter para maiúsculas
-def process_query(query_text):
-    print("Remover acentos e converter para maiúsculas:", query_text)
-    # Remover acentos
-    query_text = ''.join(c for c in unicodedata.normalize('NFD', query_text) if unicodedata.category(c) != 'Mn')
-    # Converter para maiúsculas
-    query_text = query_text.upper()
-    return query_text
+    def process_query(query_text):
+        print("Remover acentos e converter para maiúsculas:", query_text)
+        query_text = ''.join(c for c in unicodedata.normalize('NFD', query_text) if unicodedata.category(c) != 'Mn')
+        query_text = query_text.upper()
+        return query_text
 
-# Listas para armazenar os dados
-query_numbers = []
-query_texts = []
+    query_numbers = []
+    query_texts = []
 
-# Iterar sobre os elementos QUERY dentro de FILEQUERY
-for query in root.findall('.//QUERY'):
-    query_number = query.find('QueryNumber').text
-    query_text = query.find('QueryText').text
+    for query in root.findall('.//QUERY'):
+        query_number = query.find('QueryNumber').text
+        query_text = query.find('QueryText').text
 
-    query_numbers.append(query_number)
-    query_texts.append(query_text)
-
-# Criar o DataFrame
-df = pd.DataFrame({'QueryNumber': query_numbers, 'QueryText': query_texts})
-
-# Processar QueryText
-df['QueryText'] = df['QueryText'].apply(process_query)
-
-# Gerar arquivo CSV
-print("Gerando arquivo CSV")
-df.to_csv(config['CONSULTAS'], sep=';', index=False)
-
-# ------------------------------------------------------- GERAR SEGUNDO ARQUIVO
-
-# Listas para armazenar os dados
-query_numbers = []
-doc_numbers = []
-doc_votes = []
-
-# Iterar sobre os elementos QUERY dentro de FILEQUERY
-for query in root.findall('.//QUERY'):
-    query_number = query.find('QueryNumber').text
-
-    # Iterar sobre os elementos Item dentro de Records
-    for record in query.findall('.//Records/Item'):
-        doc_number = record.text
-        score = record.attrib['score']
-
-        # Calcular o número de votos para o documento
-        num_votes = 0
-        for digit in score:
-            if digit in ['1', '2']:
-                num_votes += 1
-
-        # Adicionar os dados às listas
         query_numbers.append(query_number)
-        doc_numbers.append(doc_number)
-        doc_votes.append(num_votes)
+        query_texts.append(query_text)
 
-# Criar DataFrame
-df = pd.DataFrame({'QueryNumber': query_numbers, 'DocNumber': doc_numbers, 'DocVotes': doc_votes})
+    df = pd.DataFrame({'QueryNumber': query_numbers, 'QueryText': query_texts})
 
-# Escrever DataFrame em um arquivo CSV
-print("Escrevendo DataFrame em um arquivo CSV")
-df.to_csv(config['ESPERADOS'], sep=';', index=False)
+    df['QueryText'] = df['QueryText'].apply(process_query)
 
-print("Finalizando PC em", time.strftime("%H:%M:%S"))
+    print("Gerando arquivo CSV")
+    df.to_csv(config['CONSULTAS'], sep=';', index=False)
+
+    query_numbers = []
+    doc_numbers = []
+    doc_votes = []
+
+    for query in root.findall('.//QUERY'):
+        query_number = query.find('QueryNumber').text
+
+        for record in query.findall('.//Records/Item'):
+            doc_number = record.text
+            score = record.attrib['score']
+
+            num_votes = 0
+            for digit in score:
+                if digit in ['1', '2']:
+                    num_votes += 1
+
+            query_numbers.append(query_number)
+            doc_numbers.append(doc_number)
+            doc_votes.append(num_votes)
+
+    df = pd.DataFrame({'QueryNumber': query_numbers, 'DocNumber': doc_numbers, 'DocVotes': doc_votes})
+
+    print("Escrevendo DataFrame em um arquivo CSV")
+    df.to_csv(config['ESPERADOS'], sep=';', index=False)
+
+    print("Finalizando PC em", time.strftime("%H:%M:%S"))
+
+if __name__ == "__main__":
+    main()
