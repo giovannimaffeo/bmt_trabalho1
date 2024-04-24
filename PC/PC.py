@@ -1,12 +1,16 @@
 import xml.etree.ElementTree as ET
 import pandas as pd
 import unicodedata
+import time
 
 from utils import process_config
 
+print("Iniciando PC em", time.strftime("%H:%M:%S"))
 
+print("Função para remover os ';' do arquivo XML")
 # Função para remover os ";" do arquivo XML
 def remove_semicolon(filename):
+    print("Removendo ';' do arquivo XML:", filename)
     with open(filename, 'r') as file:
         data = file.read()
         data = data.replace(';', '')
@@ -14,19 +18,23 @@ def remove_semicolon(filename):
         file.write(data)
 
 # Ler o arquivo de configuração
+print("Lendo o arquivo de configuração")
 config = process_config('PC.CFG')
 
 # Remover ";" do arquivo XML
 remove_semicolon(config['LEIA'])
 
 # Carregar o arquivo XML
+print("Carregando o arquivo XML")
 tree = ET.parse(config['LEIA'])
 root = tree.getroot()
 
 # ------------------------------------------------------- GERAR PRIMEIRO ARQUIVO
 
+print("Função para remover acentos e converter para maiúsculas")
 # Função para remover acentos e converter para maiúsculas
 def process_query(query_text):
+    print("Remover acentos e converter para maiúsculas:", query_text)
     # Remover acentos
     query_text = ''.join(c for c in unicodedata.normalize('NFD', query_text) if unicodedata.category(c) != 'Mn')
     # Converter para maiúsculas
@@ -52,6 +60,7 @@ df = pd.DataFrame({'QueryNumber': query_numbers, 'QueryText': query_texts})
 df['QueryText'] = df['QueryText'].apply(process_query)
 
 # Gerar arquivo CSV
+print("Gerando arquivo CSV")
 df.to_csv(config['CONSULTAS'], sep=';', index=False)
 
 # ------------------------------------------------------- GERAR SEGUNDO ARQUIVO
@@ -85,4 +94,7 @@ for query in root.findall('.//QUERY'):
 df = pd.DataFrame({'QueryNumber': query_numbers, 'DocNumber': doc_numbers, 'DocVotes': doc_votes})
 
 # Escrever DataFrame em um arquivo CSV
+print("Escrevendo DataFrame em um arquivo CSV")
 df.to_csv(config['ESPERADOS'], sep=';', index=False)
+
+print("Finalizando PC em", time.strftime("%H:%M:%S"))
