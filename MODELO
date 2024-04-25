@@ -6,22 +6,18 @@ Busca.
 
 Indexação:
 - Term Frequency (TF): Calcula a frequência de termos em cada documento, normalizada pela maior frequência de termos no
-documento.
-- Inverse Document Frequency (IDF): Calcula o peso de cada termo, penalizando termos muito frequentes.
-- TF-IDF: Multiplica TF por IDF para obter uma matriz TF-IDF, representando a importância de cada termo em cada
-documento.
+documento. A estrutura é uma matriz n x m, onde n é o número de termos e m é o número de documentos
+- Inverse Document Frequency (IDF): Calcula a métrica para cada termo que é dada por: log ( número de documentos no
+conjunto / número de documentos que contém o termo.
+- TF-IDF (Vetorial Model): Obtemos o modelo vetorial dos termos a partir da multiplicação da matriz TF por  IDF.
 
-Busca:
-- Query Vector: Cria um vetor de consulta, similar ao vetor de documentos, usando TF e IDF.
+Busca: recebemos o modelo vetorial dos termos e a matriz IDF
+- Query Vectorial Model: A partir do modelo vetorial e da matriz IDF, geramos o Query Vectorial Model que consiste em
+uma matriz n x m, onde n é o número de termos do modelo vetorial e m é o número de consultas (resultado do módulo PC).
+Basicamente, preenchemos cada célula aij (se o termo i está presente na consulta j) com o seguinte cálculo: 1 * IDF
+do termo da matriz IDF (utilizamos sempre 1 * IDF, já que foi solicitado que cada palavra na consulta tenha peso 1 no
+enunciado do trabalho).
 - Similaridade: Calcula a similaridade entre o vetor de consulta e os vetores de documentos usando a similaridade do
 cosseno.
 - Ranking: Ordena os documentos por similaridade e gera um ranking de relevância.
-
-Estrutura do Modelo:
-- Vetorial Model: Representa os documentos como vetores, onde cada dimensão corresponde a um termo e o valor representa
-a importância do termo no documento.
-- IDF Matrix: Uma matriz que armazena os valores IDF de cada termo.
-- Query Vectorial Model: Uma representação vetorial das consultas, semelhante ao Vetorial Model, usado para calcular a
-similaridade com os documentos. O processo de busca utiliza o Vetorial Model, IDF Matrix e Query Vectorial Model para
-calcular a relevância dos documentos em relação às consultas.
 
