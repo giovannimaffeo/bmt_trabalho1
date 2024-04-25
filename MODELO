@@ -21,3 +21,5 @@ enunciado do trabalho).
 cosseno.
 - Ranking: Ordena os documentos por similaridade e gera um ranking de relevância.
 
+Toda a lógica utilizou como base um exemplo registrado no moodle para a construção do modelo vetorial:
+https://moodle.cos.ufrj.br/pluginfile.php/47233/mod_resource/content/0/BMT20241300%20240%20Exemplo%20Modelo%20Vetorial.pdf
